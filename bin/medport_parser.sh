@@ -6,10 +6,11 @@ if [ $? != 0 ]; then
   exit 0
 fi
 
+source ../lib/get_date.func
+
+VERBOSE=false
 KO=false
 BIO=false
-#KO_possible_params=(WBC RBC HGB HCT MCV)
-#BIO_possible_params=(Na K CI)
 KO_params=()
 BIO_params=()
 NAME="_name_"
@@ -32,8 +33,12 @@ while (($#)); do
       BIO=true
       BIO_params+=($1)
     ;;
+    -v|--verbose)
+      VERBOSE=true
+    ;;
     *)
-      echo "unknown par"
+      echo "UNKNOWN PARAMETER, exiting."
+      exit 1
     ;;
    esac
 shift
@@ -50,11 +55,10 @@ echo $ID_NUM
 
 if $KO ; then
   #date of medical procedure
-  date=$(grep 'KO ' ${path_to_txt_reports}/${report} | awk '{print $2}' | awk -F '-' '{print $1}')
-  time_array=($(grep 'KO ' ${path_to_txt_reports}/${report} | awk '{print $2}' | awk -F '-' '{gsub(/:$/,"",$2); print $2}' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g' | cut -c 2-))  
+  get_date "KO" "${path_to_txt_reports}/${report}" # returns arr DATES_KO
+  get_times "KO" "${path_to_txt_reports}/${report}" # returns arr TIMES_KO
 fi
-
-echo ${time_array[@]}
-
-#fi
-
+if $BIO ; then
+  get_date "BIO" "${path_to_txt_reports}/${report}" # returns arr DATES_BIO
+  get_times "BIO" "${path_to_txt_reports}/${report}" # returns arr TIMES_BIO
+fi

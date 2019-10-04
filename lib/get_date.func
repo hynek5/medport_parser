@@ -1,0 +1,47 @@
+#!/bin/bash
+#################################################
+# Function: verbose_print 
+# Inputs : $1 - printed msg
+#################################################
+verbose_print () {
+  if $VERBOSE; then
+    echo "VERBOSE: $*"
+  fi
+}
+
+#################################################
+# Function: get_date
+# Inputs : $1 - type of medical lab check-up
+#          $2 - full relative path to pdf report
+# Outputs: DATES - array of dates
+#################################################
+get_date () {
+  if  [ "$1" == "KO" ]; then
+    DATES_KO=()
+    DATES_KO=($(grep "$1 " $2 | awk '{print $2}' | awk -F '-' '{print $1}'))
+    verbose_print "function get_date(): DATES_KO are ${DATES_KO[@]}"
+  else 
+    DATES_BIO=()
+    DATES_BIO=($(grep "$1 " $2 | awk '{print $2}' | awk -F '-' '{print $1}'))
+    verbose_print "function get_date(): DATES_KO are ${DATES_BIO[@]}"
+   fi
+}
+
+#################################################
+# Function: get_times
+# Inputs : $1 - type of medical lab check-up
+#          $2 - full relative path to pdf report
+# Outputs: DATES - array of dates
+#################################################
+get_times () {
+  if [ "$1" == "KO" ]; then
+    TIMES_KO=()
+    TIMES_KO=($(grep "$1 " $2 | awk '{print $2}' | awk -F '-' '{gsub(/:$/,"",$2); print $2}' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g' | cut -c 2-))
+    verbose_print "function get_times(): TIMES_BIO are ${TIMES_KO[@]}"
+  else 
+    TIMES_BIO=()
+    TIMES_BIO=($(grep "$1 " $2 | awk '{print $2}' | awk -F '-' '{gsub(/:$/,"",$2); print $2}' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g' | cut -c 2-))
+    verbose_print "function get_times(): TIMES_BIO are ${TIMES_BIO[@]}"
+ fi
+}
+
